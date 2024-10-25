@@ -34,10 +34,6 @@ async def chats(
         request,
         "chats.html",
         {"chats": my_chats, "current_username": username})
-    # return templates.TemplateResponse(
-    #     "chats.html",
-    #     {"request": request, "chats": my_chats, "current_username": username}
-    # )
 
 
 @router.get('/chats/{username}/{chat_id}', response_class=HTMLResponse)
@@ -57,15 +53,6 @@ async def chat_with_user(
             "chat_id": chat_id
         }
     )
-    # return templates.TemplateResponse(
-    #     "chat_with_user.html",
-    #     {
-    #         "request": request,
-    #         "messages": messages,
-    #         "username": username,
-    #         "chat_id": chat_id
-    #     }
-    # )
 
 
 @router.post('/new_chat', status_code=status.HTTP_201_CREATED, response_model=ChatResponse)

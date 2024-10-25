@@ -113,7 +113,7 @@ class ChatRepository:
 class MessageRepository:
     @classmethod
     async def get_chat_messages(cls, chat_id: int, session: AsyncSession) -> List[MessageSchema]:
-        query = select(Message).where(Message.chat == chat_id)
+        query = select(Message).where(Message.chat == chat_id).order_by(Message.datetime)
         result = await session.execute(query)
         messages = result.scalars().all()
         return [await MessageRepository.validate_message_data(message) for message in messages]
