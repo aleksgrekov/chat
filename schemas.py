@@ -42,17 +42,6 @@ class UserRegistrationSchema(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    # class Config:
-    #     schema_extra = {
-    #         "example": {
-    #             "username": "john_doe",
-    #             "password": "Password123",
-    #             "first_name": "John",
-    #             "last_name": "Doe",
-    #             "telegram": "@john_doe"
-    #         }
-    #     }
-
     def model_post_init(self, __context):
         validate_password(self.password)
 
@@ -79,9 +68,7 @@ class MessageSchema(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-# class SaveMessageSchema(BaseModel):
-#     message: str
-#     username: str
-#     chat: int
-#
-#     # {"message": "Ghbdtn", "username": "aleksgrekov", "chat_id": "1"}
+class ChatResponse(BaseModel):
+    success: bool
+    chat_id: int = None
+    message: str = None

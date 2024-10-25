@@ -40,9 +40,6 @@ class Message(Model):
     message: Mapped[str] = mapped_column(nullable=False)
     datetime: Mapped['datetime'] = mapped_column(default=datetime.now())  # timezone.utc
 
-    # user_data = relationship('User', back_populates='user_messages')
-    # user_chats = relationship('Chat', back_populates='chat_messages')
-
     def __repr__(self) -> str:
         return (f"<Message(id={self.id}, user={self.user}, chat={self.chat},"
                 f"message={self.message}, datetime={self.datetime})>")

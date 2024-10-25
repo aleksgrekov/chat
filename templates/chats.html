@@ -61,6 +61,9 @@
         .d-grid {
             margin-top: 20px;
         }
+        .tooltip-custom {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -72,12 +75,9 @@
             <div id="chatsList">
                 {% for chat in chats %}
                 <div class="chat">
-                    <!-- Добавляем атрибуты data-id и data-username -->
                     <a class="chat-name" href="#" data-id="{{ chat.id }}" data-username="{{ chat.users[0].username }}">
                         {% if chat.users[0].first_name and chat.users[0].last_name %}
                         {{ chat.users[0].first_name }} {{ chat.users[0].last_name }}
-                        {% elif chat.users[0].first_name %}
-                        {{ chat.users[0].first_name }}
                         {% else %}
                         {{ chat.users[0].username }}
                         {% endif %}
@@ -89,46 +89,83 @@
             <p class="chat-empty">У вас пока нет чатов</p>
             {% endif %}
             <div class="d-grid gap-2">
-                <button id="newChatButton" class="btn btn-primary">Написать</button>
+                <!-- Кнопка для создания нового чата с подсказкой -->
+                <button id="newChatButton" class="btn btn-primary tooltip-custom" data-bs-toggle="tooltip"
+                        title="Начать чат с новым пользователем">
+                    <span class="me-2">Написать</span><i class="bi bi-chat-plus"></i>
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Модальное окно для ввода username -->
+<div class="modal fade" id="newChatModal" tabindex="-1" aria-labelledby="newChatModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newChatModalLabel">Новый чат</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="usernameInput" class="form-control" placeholder="Введите username" required>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" id="confirmNewChat">Начать чат</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Используем переданный current_username
     const currentUsername = "{{ current_username }}";
+
+    // Инициализация подсказки
+    document.querySelectorAll('.tooltip-custom').forEach(el => new bootstrap.Tooltip(el));
 
     document.querySelectorAll('.chat-name').forEach(chat => {
         chat.addEventListener('click', function (event) {
-            // Получаем ID и username чата
             const chatId = event.target.getAttribute('data-id');
-
-            // Перенаправляем на нужный эндпоинт с параметрами usename и chat_id
             window.location.href = `/mychat/chats/${encodeURIComponent(currentUsername)}/${chatId}`;
         });
     });
 
+    // Открытие модального окна для нового чата
     document.getElementById("newChatButton").addEventListener("click", function () {
-        const username = prompt("Введите имя пользователя для нового чата:");
+        const newChatModal = new bootstrap.Modal(document.getElementById("newChatModal"));
+        newChatModal.show();
+    });
+
+    // Отправка POST-запроса для создания нового чата и редирект на созданный чат
+    document.getElementById("confirmNewChat").addEventListener("click", function () {
+        const username = document.getElementById("usernameInput").value.trim();
         if (username) {
-            fetch('/mychat/create', {
+            fetch('/mychat/new_chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: username })
-            })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        alert('Чат успешно создан!');
-                        location.reload();
-                    } else {
-                        alert('Ошибка создания чата: ' + result.message);
-                    }
+                body: JSON.stringify({
+                    current_user: currentUsername,
+                    target_user: username
                 })
-                .catch(error => {
-                    console.error('Ошибка:', error);
-                });
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(result => {
+                if (result.success && result.chat_id) {
+                    const chatId = result.chat_id; // ID нового чата
+                    window.location.href = `/mychat/chats/${encodeURIComponent(currentUsername)}/${chatId}`;
+                } else {
+                    alert('Error: ' + (result.message || 'Не удалось создать чат'));
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при создании чата. Пожалуйста, попробуйте снова.');
+            });
         }
     });
 </script>

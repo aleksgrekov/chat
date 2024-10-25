@@ -43,20 +43,18 @@
 <div class="container form-container">
     <div class="form-box">
         <h2>Register</h2>
-        <form id="registration
-
-Form">
+        <form id="registrationForm">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" class="form-control" id="username" placeholder="Enter your username" required>
             </div>
             <div class="mb-3">
                 <label for="first_name" class="form-label">First Name</label>
-                <input type="text" class="form-control" id="first_name" placeholder="Enter your first name" required>
+                <input type="text" class="form-control" id="first_name" placeholder="Enter your first name">
             </div>
             <div class="mb-3">
                 <label for="last_name" class="form-label">Last Name</label>
-                <input type="text" class="form-control" id="last_name" placeholder="Enter your last name" required>
+                <input type="text" class="form-control" id="last_name" placeholder="Enter your last name">
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
@@ -78,7 +76,7 @@ Form">
         const lastName = document.getElementById("last_name").value;
         const password = document.getElementById("password").value;
 
-        const response = await fetch("http://127.0.0.1:8000/mychat/create_user", {
+        const response = await fetch("http://127.0.0.1:8000/mychat/new_user", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, first_name: firstName, last_name: lastName, password })

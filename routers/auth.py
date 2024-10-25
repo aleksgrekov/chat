@@ -16,17 +16,21 @@ router = APIRouter(
 templates = Jinja2Templates(directory="templates")
 
 
+async def render_template(request: Request, template_name: str):
+    return templates.TemplateResponse(request=request, name=template_name)
+
+
 @router.get('/auth', response_class=HTMLResponse, status_code=status.HTTP_200_OK)
 async def authentication(request: Request):
-    return templates.TemplateResponse(
-        request=request, name="auth.html"
+    return await render_template(
+        request=request, template_name="auth.html"
     )
 
 
 @router.get('/registration', response_class=HTMLResponse, status_code=status.HTTP_200_OK)
 async def registration(request: Request):
-    return templates.TemplateResponse(
-        request=request, name="registration.html"
+    return await render_template(
+        request=request, template_name="registration.html"
     )
 
 
@@ -36,15 +40,20 @@ async def check_user_data(data: LoginData, db: AsyncSession = Depends(create_ses
 
     if not user:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail={"msg": "No user with these username or password"})
     return
 
 
 @router.post('/new_user', response_model=Dict[str, str], status_code=status.HTTP_201_CREATED)
 async def add_user(user_data: UserRegistrationSchema, db: AsyncSession = Depends(create_session)):
-    await UserRepository.add_user(data=user_data, session=db)
-    return {
-        "message":
-            f'The user {user_data.username} has been successfully added'
-    }
+    try:
+        await UserRepository.add_user(data=user_data, session=db)
+        return {
+            "message":
+                f'The user {user_data.username} has been successfully added'
+        }
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={"msg": str(exc)})

@@ -22,6 +22,7 @@ async def lifespan(fast_api: FastAPI):
             User(username='aleksgrekov', password=UserRepository.hash_password('d3664645D')),
             User(username='innarodinskaia', password='234', first_name='Inna', last_name='Grekova'),
             User(username='chegachega', first_name='Денис', password=UserRepository.hash_password('d3664645D')),
+            User(username='mckensy', first_name='Саша', password=UserRepository.hash_password('d3664645D')),
             Chat(users=[1, 2]),
             Chat(users=[1, 3]),
             Message(user=1, chat=1, message='Привет!'),
