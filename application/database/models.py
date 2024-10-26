@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from sqlalchemy import String, ForeignKey, UniqueConstraint, ARRAY, Integer
+from sqlalchemy import String, ForeignKey, ARRAY, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship, backref
 
 from database.init import Model
@@ -16,6 +16,8 @@ class User(Model):
     first_name: Mapped[str | None] = mapped_column(String(50))
     last_name: Mapped[str | None] = mapped_column(String(50))
     telegram: Mapped[str | None]
+    telegram_chat_id: Mapped[int | None]
+    notice: Mapped[bool] = mapped_column(default=False)
 
     user_messages = relationship(
         'Message',

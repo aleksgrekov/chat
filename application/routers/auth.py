@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.repositories import UserRepository
-from database.init import create_session  # session
+from database.init import create_session
 from schemas import LoginData, UserRegistrationSchema
 
 router = APIRouter(

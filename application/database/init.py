@@ -1,16 +1,22 @@
+import os
 from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import DeclarativeBase
 
-DATABASE_URL = "postgresql+asyncpg://admin:admin@localhost:5432/chat_database"
+DATABASE_USER = os.getenv('DATABASE_USER')
+DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
+DATABASE_HOST = os.getenv('DATABASE_HOST')
+DATABASE_PORT = os.getenv('DATABASE_PORT')
+DATABASE_NAME = os.getenv('DATABASE_NAME')
 
-engine = create_async_engine(DATABASE_URL, echo=True)
+DATABASE_URL = f"postgresql+asyncpg://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
+
+engine = create_async_engine(DATABASE_URL, echo=False)
 async_session = async_sessionmaker(
     engine,
     expire_on_commit=False
 )
-session2 = async_session()
 
 
 class Model(DeclarativeBase):

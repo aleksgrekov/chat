@@ -47,9 +47,13 @@ class UserRegistrationSchema(BaseModel):
 
 
 class UserSchema(BaseModel):
+    id: int
     username: str
     first_name: str | None
     last_name: str | None
+    telegram: str | None
+    telegram_chat_id: int | None
+    notice: bool
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -68,7 +72,18 @@ class MessageSchema(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class ChatResponse(BaseModel):
     success: bool
     chat_id: int = None
     message: str = None
+
+
+class NoticeData(BaseModel):
+    username: str
+    telegram: str
+    notice: bool
+
+class TelegramData(BaseModel):
+    username: str
+    chat_id: int

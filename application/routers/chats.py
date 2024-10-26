@@ -1,6 +1,5 @@
 from datetime import datetime
 from json import loads
-from typing import Dict, Any
 
 from fastapi import APIRouter, Request, status, Depends, Path, Body
 from fastapi.templating import Jinja2Templates
@@ -8,8 +7,8 @@ from fastapi.responses import HTMLResponse
 from fastapi import WebSocket, WebSocketDisconnect
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.repositories import ChatRepository, MessageRepository
-from database.init import create_session  # session
+from database.repositories import ChatRepository, MessageRepository, UserRepository
+from database.init import create_session
 from schemas import ChatResponse
 
 router = APIRouter(
@@ -30,10 +29,11 @@ async def chats(
         db: AsyncSession = Depends(create_session)
 ):
     my_chats = await ChatRepository.get_users_chats(username=username, session=db)
+    user = await UserRepository.get_user_by_username(username=username, session=db)
     return await render_template(
         request,
         "chats.html",
-        {"chats": my_chats, "current_username": username})
+        {"chats": my_chats, "current_user": user})
 
 
 @router.get('/chats/{username}/{chat_id}', response_class=HTMLResponse)
@@ -78,10 +78,13 @@ async def websocket_endpoint(websocket: WebSocket,
     try:
         while True:
             data = await websocket.receive_text()
+
             data_dict = loads(data)
             data_dict['datetime'] = datetime.fromisoformat(data_dict.get('datetime')[:-1])
+            await ChatRepository.send_notice_to_user(chat_id=data_dict.get('chat'), session=db, username=data_dict.get('user'))
             await MessageRepository.save_message(db, data_dict)
             await websocket.send_text(data)
+
     except WebSocketDisconnect:
         print(f"Пользователь отключился от WebSocket")
     except Exception as e:
