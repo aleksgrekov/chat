@@ -12,7 +12,7 @@ from routers.notice_to_tg import router as notice_router
 
 @asynccontextmanager
 async def lifespan(fast_api: FastAPI):
-    await delete_tables()
+    # await delete_tables()
     print("База очищена")
     await create_tables()
     print("База готова к работе")

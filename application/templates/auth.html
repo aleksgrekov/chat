@@ -81,7 +81,7 @@
         const password = document.getElementById("password").value;
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/mychat/check_data", {
+            const response = await fetch("/mychat/check_data", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password })
